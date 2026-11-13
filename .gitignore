@@ -1,0 +1,15 @@
+*.log
+.DS_Store
+.env.backup
+.env.production
+.phpactor.json
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
+/auth.json
+/storage/*.key
+/vendor
+Thumbs.db
+storage/

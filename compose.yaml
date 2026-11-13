@@ -1,0 +1,32 @@
+services:
+  app:
+    build: .
+    ports:
+      - "${APP_PORT:-8088}:80"
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: mysql:8.4
+    command: --restrict-fk-on-non-standard-key=OFF
+    environment:
+      MYSQL_DATABASE: csc364chms
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: chms-local-root
+    ports:
+      - "127.0.0.1:${DB_PORT:-3308}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./database/db.sql:/docker-entrypoint-initdb.d/db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_PASSWORD mysql -h 127.0.0.1 -u$$MYSQL_USER $$MYSQL_DATABASE -e 'SELECT 1 FROM contacts LIMIT 1'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+volumes:
+  mysql-data:
